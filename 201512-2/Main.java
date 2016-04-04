@@ -1,100 +1,79 @@
+import java.util.ArrayDeque;
 import java.util.Scanner;
 
 public class Main {
 
-	private int n, m;
-	private int[][] num, out;
+	public static int height, width;
+	public static int[][] num;
+	public static ArrayDeque<Element> queue1, queue2;
 
 	public static void main(String[] args) {
-		Main m = new Main();
-		m.read_data();
-		m.process_data();
+		read_data();
+		process_data();
+		print();
 	}
 
-	private void process_data() {
-		search1();
-		search2();
-		print_num();
-	}
-
-	private void search2() {
-		int temp;
-		int count = 1;
-		for (int j = 0; j < m; j++) {
-			temp = num[0][j];
-			for (int i = 0; i < n; i++) {
-				if (i == 0) {
-					continue;
-				}
-				if (temp == num[i][j]) {
-					count++;
-				}
-				if (count > 2)
-					if (temp != num[i][j] || i == n - 1) {
-						count = 1;
-						for (int k = i; k >= 0; k--) {
-							if (temp == num[k][j]) {
-								out[k][j] = 0;
-							}
-						}
-					}
-				temp = num[i][j];
-			}
-			count = 1;
-		}
-	}
-
-	private void print_num() {
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				System.out.print(out[i][j]);
-				if (j != m - 1) {
+	private static void print() {
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				System.out.print(num[i][j]);
+				if (j != width - 1) 
 					System.out.print(" ");
-				}
 			}
 			System.out.println();
 		}
 	}
 
-	private void search1() {
-		int temp;
-		int count = 1;
-		for (int i = 0; i < n; i++) {
-			temp = num[i][0];
-			for (int j = 0; j < m; j++) {
-				if (j == 0) {
-					continue;
+	public static void process_data() {
+		queue1 = new ArrayDeque<Element>();
+		queue2 = new ArrayDeque<Element>();
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (0 <= i - 1 && i + 1 < height && num[i][j] == num[i - 1][j] 
+						&& num[i][j] == num[i + 1][j]) {
+					queue1.addLast(new Element(i, j));
 				}
-				if (temp == num[i][j]) {
-					count++;
+				if (0 <= j - 1 && j + 1 < width && num[i][j] == num[i][j - 1]
+						&& num[i][j] == num[i][j + 1]) {
+					queue2.addLast(new Element(i, j));
 				}
-				if (count > 2)
-					if (temp != num[i][j] || j == m - 1) {
-						count = 1;
-						for (int k = j; k >= 0; k--) {
-							if (temp == num[i][k]) {
-								out[i][k] = 0;
-							}
-						}
-					}
-				temp = num[i][j];
 			}
-			count = 1;
+		}
+		Element elem;
+		while(!queue1.isEmpty()) {
+			elem = queue1.removeFirst();
+			num[elem.h][elem.w] = 0;
+			num[elem.h + 1][elem.w] = 0;
+			num[elem.h - 1][elem.w] = 0;
+		}
+		while(!queue2.isEmpty()) {
+			elem = queue2.removeFirst();
+			num[elem.h][elem.w] = 0;
+			num[elem.h][elem.w + 1] = 0;
+			num[elem.h][elem.w - 1] = 0;
 		}
 	}
 
-	private void read_data() {
+	public static void read_data() {
 		Scanner sc = new Scanner(System.in);
-		n = sc.nextInt();
-		m = sc.nextInt();
-		num = new int[n][m];
-		out = new int[n][m];
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				out[i][j] = num[i][j] = sc.nextInt();
+		height = sc.nextInt();
+		width = sc.nextInt();
+		num = new int[height][width];
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				num[i][j] = sc.nextInt();
 			}
 		}
 		sc.close();
 	}
 
+}
+
+class Element {
+	public int h, w;
+
+	Element(int h, int w) {
+		this.h = h;
+		this.w = w;
+	}
 }
